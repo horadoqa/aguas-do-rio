@@ -13,7 +13,7 @@ import os
 # CONFIGURAÇÕES
 # ==========================
 
-URL_ALVO = "https://aguasdorio.com.br/comunicados/"  # COLOQUE A URL REAL
+URL_ALVO = "https://aguasdorio.com.br/comunicados/"
 PALAVRA_CHAVE = "Nova Iguaçu"
 
 EMAIL_REMETENTE = "contaservico.horadoqa@gmail.com"
@@ -28,7 +28,7 @@ SMTP_PORTA = 587
 # FUNÇÃO PARA ENVIAR EMAIL
 # ==========================
 
-def enviar_email(titulo_encontrado):
+def enviar_email(titulo_encontrado, link):
     assunto = f"Encontrado: {PALAVRA_CHAVE}"
 
     corpo = f"""
@@ -36,6 +36,9 @@ A palavra '{PALAVRA_CHAVE}' foi encontrada!
 
 Título encontrado:
 {titulo_encontrado}
+
+Link:
+{link}
 
 Data/Hora: {datetime.datetime.now()}
 """
@@ -86,10 +89,16 @@ def verificar_site():
 
         for titulo in titulos:
             texto = titulo.text.strip()
-            print("Encontrado na página:", texto)
+            # Pega o link do elemento pai <a>
+            try:
+                link = titulo.find_element(By.XPATH, "..").get_attribute("href")
+            except:
+                link = "Link não encontrado"
+
+            print("Encontrado na página:", texto, "| Link:", link)
 
             if PALAVRA_CHAVE.lower() in texto.lower():
-                enviar_email(texto)
+                enviar_email(texto, link)
                 encontrado = True
                 break
 
